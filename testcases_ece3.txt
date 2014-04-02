@@ -1,0 +1,46 @@
+*** Settings ***
+Library    OperatingSystem
+Library    Process
+Library    String
+Library    XML
+
+
+*** Variable ***
+${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
+#${RERUN_REFORMAT}     TRUE    # (TRUE|FALSE)
+
+# Useful arguments:
+# --variable RERUN_REFORMAT:FALSE
+# --test 'namelist_SPI.xml'  # To include only this (these) test cases
+
+
+
+
+# Comments can be written like this
+
+# This test suite case file, and the namelists referred to herein,
+# is adapted to run on the HPC Krypton
+
+*** Test Cases ***
+repository_checkout
+    ${handle} =    Run Process    svn        checkout        ${ece_repos}     stdout=stdout_${TEST_NAME}.txt     stderr=stderr_${TEST_NAME}.txt
+    Should Be Equal As Integers      ${handle.rc}       0
+#    ${root} =    Parse XML        ${namelist_folder}/${TEST_NAME} 
+#    ${plot_path} =    Get Element Text             ${root}     GLOBAL/plot_dir    normalize_whitespace=True
+#    ${climo_path} =    Get Element Text             ${root}     GLOBAL/climo_dir    normalize_whitespace=True
+#    Remove Directory    ${plot_path}    recursively=True
+#    ${plot_name}        ${group1} =      Should Match Regexp     ${TEST_NAME}    namelist_(.*).xml
+#
+#    Run Keyword If    '${RERUN_REFORMAT}' == 'TRUE'    Remove Directory    ${climo_path}    recursively=True
+#
+#    ${output} =          Run Process     nml/test_suites/smhi/add_scipy_site.bash
+#    ${handle} =    Run Process    ./main.py    ${namelist_folder}/${TEST_NAME}     stdout=stdout_${group1}.txt     stderr=stderr_${group1}.txt
+#    ${output} =          Run Process     nml/test_suites/smhi/remove_scipy_site.bash
+#
+#    ${fileSize} =        Get File Size        ${plot_path}/matlab_contour_pr_mmday_T2Ms_CMIP5_EC-EARTH_Amon_historical_r12i1p1_1999-2004.eps
+#    ${fileSize_str} =    Convert To String    ${fileSize}
+#    Should Match Regexp                       ${fileSize_str}    ^\\d{7}$
+#
+#    ${fileSize} =        Get File Size        ${plot_path}/matlab_contour_pr_mmday_T2Ms_CMIP5_MPI-ESM-LR_Amon_historical_r1i1p1_1999-2004.eps
+#    ${fileSize_str} =    Convert To String    ${fileSize}
+#    Should Match Regexp                       ${fileSize_str}    ^\\d{6}$
