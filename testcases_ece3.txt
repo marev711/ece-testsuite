@@ -14,6 +14,9 @@ ${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
 # --test 'namelist_SPI.xml'  # To include only this (these) test cases
 
 
+${platform}                  krypton-intel-intelmpi
+${ecearth_src_dir}           trunk/sources
+${config_build_xml}          ${ecearth_src_dir}/config-build.xml
 
 
 # Comments can be written like this
@@ -22,10 +25,22 @@ ${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
 # is adapted to run on the HPC Krypton
 
 *** Test Cases ***
-repository_checkout
-    ${handle} =    Run Process    svn        checkout        ${ece_repos}     stdout=stdout_${TEST_NAME}.txt     stderr=stderr_${TEST_NAME}.txt
-    Should Be Equal As Integers      ${handle.rc}       0
-#    ${root} =    Parse XML        ${namelist_folder}/${TEST_NAME} 
+#repository_checkout
+#    ${handle} =       Run Process                    svn             checkout    ${ece_repos}    stdout=stdout_${TEST_NAME}.txt    stderr=stderr_${TEST_NAME}.txt
+#                      Should Be Equal As Integers    ${handle.rc}    0
+
+update_makefile_templates
+     ${xml_handle} =    Parse XML                      ${config_build_xml}
+                        Set Element Text               ${xml_handle}          ${EXECDIR}/${ecearth_src_dir}        xpath=Platform[@name='krypton-intel-intelmpi']/Parameter[@name='ECEARTH_SRC_DIR']/Value
+                        Save XML                       ${xml_handle}          ${config_build_xml}
+     ${handle} =        Run Process                    util/ec-conf/ec-conf   -p    ${platform}    config-build.xml     cwd=${ecearth_src_dir}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+                        Should Be Equal As Integers    ${handle.rc}           0
+
+
+#compile_oasis
+#    ${handle} =       Run Process                       make    -f     TopMakefileOasis3    BUILD_ARCH=ecconf                checkout       ${ece_repos}       stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                      Should Be Equal As Integers       ${handle.rc}       0
+
 #    ${plot_path} =    Get Element Text             ${root}     GLOBAL/plot_dir    normalize_whitespace=True
 #    ${climo_path} =    Get Element Text             ${root}     GLOBAL/climo_dir    normalize_whitespace=True
 #    Remove Directory    ${plot_path}    recursively=True
