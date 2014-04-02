@@ -1,0 +1,72 @@
+*** Settings ***
+Library    OperatingSystem
+Library    Process
+Library    String
+Library    XML
+
+
+*** Variable ***
+${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
+#${RERUN_REFORMAT}     TRUE    # (TRUE|FALSE)
+
+# Useful arguments:
+# --variable RERUN_REFORMAT:FALSE
+# --test 'namelist_SPI.xml'  # To include only this (these) test cases
+
+
+${platform}                krypton
+${ecearth_src_dir}         trunk/sources
+${ecearth_run_dir}         trunk/runtime
+${config_run_xml}          ${ecearth_run_dir}/config-run.xml
+
+
+# Comments can be written like this
+
+# This test suite case file, and the namelists referred to herein,
+# is adapted to run on the HPC Krypton
+
+*** Test Cases ***
+update_config_run_xml
+     ${xml_handle} =    Parse XML                      ${config_run_xml}
+                        Set Element Text               ${xml_handle}          ${EXECDIR}/${ecearth_src_dir}        xpath=Platform[@name='krypton']/Parameter[@name='ECEARTH_SRC_DIR']/Value
+                        Set Element Text               ${xml_handle}          \$\{run_start_date\} + 2 monhts      xpath=Model[@name='GENERAL']/Parameter[@name='RUN_END_DATE']/Value
+                        Set Element Text               ${xml_handle}          1 month                              xpath=Model[@name='GENERAL']/Parameter[@name='RST_FREQ']/Value
+                        Set Element Text               ${xml_handle}          256                                  xpath=Model[@name='IFS']/Parameter[@name='NUMPROC']/Value
+                        Set Element Text               ${xml_handle}          128                                  xpath=Model[@name='NEM']/Parameter[@name='NUMPROC']/Value
+                        Save XML                       ${xml_handle}          ${config_run_xml}
+
+
+run_ecconf
+     ${handle} =        Run Process                    ../sources/util/ec-conf/ec-conf   -p    ${platform}    config-run.xml     cwd=${ecearth_run_dir}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+                        Should Be Equal As Integers    ${handle.rc}           0
+
+
+prepare_run_folder
+     ${xml_handle} =     Parse XML                      ${config_run_xml}
+     ${run_dir} =        Get Element Text               ${xml_handle}          xpath=Platform[@name='krypton']/Parameter[@name='RUN_DIR']/Value    normalize_whitespace=True
+     ${exp_name} =       Get Element Text               ${xml_handle}          xpath=Model[@name='GENERAL']/Parameter[@name='EXP_NAME']/Value      normalize_whitespace=True
+    
+     ${run_dir} =        Run Process    scripts/echo_run_dir.bash    ${run_dir}        shell=True    env:exp_name=${exp_name}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+     ${run_dir} =        Run Process    scripts/echo_run_dir.bash    ${run_dir.stdout}        shell=True    env:exp_name=${exp_name}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+     Remove Directory    ${run_dir.stdout}    recursively=True
+
+
+
+
+# compile_oasis
+#     ${handle} =       Run Process                       make    -f     TopMakefileOasis3    BUILD_ARCH\=ecconf     cwd=${ecearth_src_dir}/oasis3/util/make_dir    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                       Should Be Equal As Integers       ${handle.rc}       0
+# 
+# compile_orca1
+#     ${handle} =       Run Process                       ./makenemo   -m    ecconf    -n    ORCA1L46_LIM3    -j    ${no_parallel_make_procs}    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                       Should Be Equal As Integers       ${handle.rc}       0
+# 
+# compile_orca025
+#     ${handle} =       Run Process                       ./makenemo   -m    ecconf    -n    ORCA025L75_LIM3    -j    ${no_parallel_make_procs}    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                       Should Be Equal As Integers       ${handle.rc}       0
+# 
+# compile_ifs
+#     ${handle} =       Run Process                       make   BUILD_ARCH\=ecconf    lib    -j    ${no_parallel_make_procs}    cwd=${ecearth_src_dir}/ifs-36r4    stdout=stdout_lib_${TEST_NAME}.txt       stderr=stderr_lib_${TEST_NAME}.txt
+#                       Should Be Equal As Integers       ${handle.rc}       0
+#     ${handle} =       Run Process                       make   BUILD_ARCH\=ecconf    master                                    cwd=${ecearth_src_dir}/ifs-36r4    stdout=stdout_master_${TEST_NAME}.txt       stderr=stderr_master_${TEST_NAME}.txt
+#                       Should Be Equal As Integers       ${handle.rc}       0
