@@ -1,4 +1,6 @@
 .gitignore
 stdout_*
 stderr_*
-log.html output.xml report.html
+log.html
+output.xml
+report.html
