@@ -18,9 +18,21 @@ ${platform}                krypton
 ${ecearth_src_dir}         trunk/sources
 ${ecearth_run_dir}         trunk/runtime
 ${config_run_xml}          ${ecearth_run_dir}/config-run.xml
+
 ${ifs_numproc}             512
 ${nem_numproc}             256
 
+#${ifs_grid}               T511L91
+#${ifs_tstep}              900
+#${nem_grid}               ORCA025L75
+#${nem_tstep}              1200
+#${nem_tstep_ice}          1200
+
+${ifs_tstep}              2700
+${ifs_grid}               T255L91
+${nem_grid}               ORCA1L46
+${nem_tstep}              3600
+${nem_tstep_ice}          3600
 
 # Comments can be written like this
 
@@ -35,7 +47,12 @@ update_config_run_xml
                         Set Element Text               ${xml_handle}          \$\{run_start_date\} + 2 months      xpath=Model[@name='GENERAL']/Parameter[@name='RUN_END_DATE']/Value
                         Set Element Text               ${xml_handle}          1 month                              xpath=Model[@name='GENERAL']/Parameter[@name='RST_FREQ']/Value
                         Set Element Text               ${xml_handle}          ${ifs_numproc}                       xpath=Model[@name='IFS']/Parameter[@name='NUMPROC']/Value
+                        Set Element Text               ${xml_handle}          ${ifs_grid}                          xpath=Model[@name='IFS']/Parameter[@name='GRID']/Value
+                        Set Element Text               ${xml_handle}          ${ifs_tstep}                         xpath=Model[@name='IFS']/Parameter[@name='TIME_STEP_SEC']/Value
                         Set Element Text               ${xml_handle}          ${nem_numproc}                       xpath=Model[@name='NEM']/Parameter[@name='NUMPROC']/Value
+                        Set Element Text               ${xml_handle}          ${nem_grid}                          xpath=Model[@name='NEM']/Parameter[@name='GRID']/Value
+                        Set Element Text               ${xml_handle}          ${nem_tstep}                         xpath=Model[@name='NEM']/Parameter[@name='NEM_TIME_STEP_SEC']/Value
+                        Set Element Text               ${xml_handle}          ${nem_tstep_ice}                     xpath=Model[@name='NEM']/Parameter[@name='LIM_TIME_STEP_SEC']/Value
                         Save XML                       ${xml_handle}          ${config_run_xml}
 
 
