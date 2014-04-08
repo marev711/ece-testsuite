@@ -4,6 +4,7 @@ Library    Process
 Library    String
 Library    XML
 
+Resource   resource_coupled_lowres.txt 
 
 *** Variable ***
 ${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
@@ -27,12 +28,6 @@ ${nem_numproc}             256
 #${nem_grid}               ORCA025L75
 #${nem_tstep}              1200
 #${nem_tstep_ice}          1200
-
-${ifs_tstep}              2700
-${ifs_grid}               T255L91
-${nem_grid}               ORCA1L46
-${nem_tstep}              3600
-${nem_tstep_ice}          3600
 
 # Comments can be written like this
 
@@ -66,5 +61,6 @@ prepare_run_folder
      ${run_dir} =        Get Element Text               ${xml_handle}          xpath=Platform[@name='krypton']/Parameter[@name='RUN_DIR']/Value    normalize_whitespace=True
      ${exp_name} =       Get Element Text               ${xml_handle}          xpath=Model[@name='GENERAL']/Parameter[@name='EXP_NAME']/Value      normalize_whitespace=True
     
-     ${run_dir} =        Run Process    scripts/echo.bash    ${run_dir}        shell=True    env:exp_name=${exp_name}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+     ${run_dir} =        Run Process                    scripts/echo.bash      ${run_dir}        shell=True    env:exp_name=${exp_name}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+                         Should Be Equal As Integers    ${run_dir.rc}           0
      Remove Directory    ${run_dir.stdout}    recursively=True

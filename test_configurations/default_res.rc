@@ -1,0 +1,7 @@
+*** Variable ***
+${ifs_tstep}              2700
+${ifs_grid}               T255L91
+${nem_grid}               ORCA1L46
+${nem_tstep}              3600
+${nem_tstep_ice}          3600
+${resubmit_opt}           -t 60

@@ -1,0 +1,46 @@
+*** Settings ***
+Library    OperatingSystem
+Library    Process
+Library    String
+Library    XML
+
+
+*** Variable ***
+${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
+#${RERUN_REFORMAT}     TRUE    # (TRUE|FALSE)
+
+# Useful arguments:
+# --variable RERUN_REFORMAT:FALSE
+# --test 'namelist_SPI.xml'  # To include only this (these) test cases
+
+
+${platform}                  krypton-intel-intelmpi
+${ecearth_src_dir}           trunk/sources
+${config_build_xml}          ${ecearth_src_dir}/config-build.xml
+${no_parallel_make_procs}    8
+
+
+# Comments can be written like this
+
+# This test suite case file, and the namelists referred to herein,
+# is adapted to run on the HPC Krypton
+
+*** Test Cases ***
+compile_orca1_standalone
+    Set Test Variable    ${nemo_config}    ORCA1L46_LIM3
+    ${handle} =       Run Process                       ./makenemo   -m    ecconf    -n    ${nemo_config}    clean    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+                      Should Be Equal As Integers       ${handle.rc}       0
+    ${handle} =       Run Process                       scripts/echo.bash ${CURDIR}         stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+    ${handle} =       Run Process                       ${CURDIR}/scripts/rewrite_cpp_for_standalone.bash cpp_ORCA1L46_LIM3.fcm    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG/ORCA1L46_LIM3    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+                      Should Be Equal As Integers       ${handle.rc}       0
+#    ${handle} =       Run Process                       ./makenemo   -m    ecconf    -n    ${nemo_config}    -j    ${no_parallel_make_procs}    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                      Should Be Equal As Integers       ${handle.rc}       0
+#
+#compile_orca025
+#     Set Test Variable    ${nemo_config}    ORCA025L75_LIM3
+#    ${handle} =       Run Process                       ./makenemo   -m    ecconf    -n    ${nemo_config}    clean    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                      Should Be Equal As Integers       ${handle.rc}       0
+#    ${handle} =       Run Process                       scripts/rewrite_cpp_for_standalone.bash cpp_${nemo_config}.fcm    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG/${nemo_config}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                      Should Be Equal As Integers       ${handle.rc}       0
+#    ${handle} =       Run Process                       ./makenemo   -m    ecconf    -n    ${nemo_config}    -j    ${no_parallel_make_procs}    cwd=${ecearth_src_dir}/nemo-3.3.1/CONFIG    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+#                      Should Be Equal As Integers       ${handle.rc}       0
