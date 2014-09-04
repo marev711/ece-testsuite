@@ -15,19 +15,11 @@ ${ece_repos}            https://svn.ec-earth.org/ecearth3/trunk
 # --test 'namelist_SPI.xml'  # To include only this (these) test cases
 
 
-${platform}                krypton
+${run_platform}            krypton
+${build_platform}          krypton
 ${ecearth_src_dir}         trunk/sources
 ${ecearth_run_dir}         trunk/runtime
 ${config_run_xml}          ${ecearth_run_dir}/config-run.xml
-
-${ifs_numproc}             512
-${nem_numproc}             256
-
-#${ifs_grid}               T511L91
-#${ifs_tstep}              900
-#${nem_grid}               ORCA025L75
-#${nem_tstep}              1200
-#${nem_tstep_ice}          1200
 
 # Comments can be written like this
 
@@ -52,7 +44,8 @@ update_config_run_xml
 
 
 run_ecconf
-     ${handle} =        Run Process                    ../sources/util/ec-conf/ec-conf   -p    ${platform}    config-run.xml     cwd=${ecearth_run_dir}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+     ${run_platform}    Run Process                    scripts/get_platform.sh    -t    run
+     ${handle} =        Run Process                    ../sources/util/ec-conf/ec-conf   -p    ${run_platform}    config-run.xml     cwd=${ecearth_run_dir}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
                         Should Be Equal As Integers    ${handle.rc}           0
 
 

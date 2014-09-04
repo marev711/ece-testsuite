@@ -5,3 +5,6 @@ ${nem_grid}               ORCA025L75
 ${nem_tstep}              1200
 ${nem_tstep_ice}          1200
 ${resubmit_opt}           -t 360
+
+${ifs_numproc}            256
+${nem_numproc}            128
