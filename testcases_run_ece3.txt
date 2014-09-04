@@ -45,7 +45,7 @@ update_config_run_xml
 
 run_ecconf
      ${run_platform}    Run Process                    scripts/get_platform.sh    -t    run
-     ${handle} =        Run Process                    ../sources/util/ec-conf/ec-conf   -p    ${run_platform}    config-run.xml     cwd=${ecearth_run_dir}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
+     ${handle} =        Run Process                    ${ecearth_src_dir}/util/ec-conf/ec-conf   -p    ${run_platform}    config-run.xml     cwd=${ecearth_run_dir}    stdout=stdout_${TEST_NAME}.txt       stderr=stderr_${TEST_NAME}.txt
                         Should Be Equal As Integers    ${handle.rc}           0
 
 
